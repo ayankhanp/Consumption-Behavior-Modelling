@@ -1,0 +1,23 @@
+flowchart LR
+    A[Raw Household Panel Data] --> B[Data Cleaning & Structuring]
+    B --> C[Exploratory Data Analysis]
+    C --> D[Segmentation & Household Aggregation]
+    D --> E[Demand Modelling]
+    E --> F[Insight Extraction]
+    F --> G[Business Recommendations]
+
+    subgraph Inputs
+      A
+    end
+
+    subgraph Analytics Engine
+      B
+      C
+      D
+      E
+    end
+
+    subgraph Output Layer
+      F
+      G
+    end
