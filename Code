@@ -1,0 +1,117 @@
+from google.colab import files
+uploaded = files.upload()
+import pandas as pd
+
+df = pd.read_csv('_a979e0f25f27452188ad26384c784407_PASTAPURCHASE_EDITED.csv', sep=';')
+df.head()
+df.describe()
+df.isna().sum()
+df['PASTA'].mean(), df['PASTA'].std()
+import matplotlib.pyplot as plt
+
+plt.scatter(df['INCOME'], df['PASTA'])
+plt.xlabel('Income')
+plt.ylabel('Pasta Purchased')
+plt.show()
+import statsmodels.formula.api as smf
+model = smf.ols('PASTA ~ EXPOS + AGE + INCOME', data=df).fit()
+model.summary()
+df.to_csv('cleaned_pasta.csv', index=False)
+files.download('cleaned_pasta.csv')
+df.head()
+df.info()
+df.describe()
+df.isna().sum()
+df.dtypes
+df.duplicated().sum()
+poorest = df.loc[df['INCOME'].idxmin()]
+wealthiest = df.loc[df['INCOME'].idxmax()]
+poorest_area = poorest['AREA']
+wealthiest_area = wealthiest['AREA']
+df[df['INCOME'] == df['INCOME'].min()]
+df[df['INCOME'] == df['INCOME'].max()]
+import seaborn as sns
+sns.boxplot(x='AREA', y='INCOME', data=df)
+# total_pasta_per_household = sum(PASTA grouped by HHID)
+# max_pasta = maximum of total_pasta_per_household
+# Step 1: Group by household and sum pasta quantities
+household_totals = df.groupby('HHID')['PASTA'].sum()
+
+# Step 2: Find the maximum total pasta bought by any household
+max_pasta = household_totals.max()
+
+max_pasta
+household_totals.idxmax()
+household_totals.describe()
+household_totals.sort_values(ascending=False).head(10)
+import matplotlib.pyplot as plt
+
+household_totals.sort_values(ascending=False).head(20).plot(kind='bar')
+plt.xlabel('Household ID')
+plt.ylabel('Total Pasta Purchased')
+plt.title('Top 20 Pasta Buying Households')
+plt.show()
+# Filter households in area 4
+area4_df = df[df['AREA'] == 4]
+
+# Calculate average income
+average_income_area4 = area4_df['INCOME'].mean()
+
+average_income_area4
+pasta_per_household = df.groupby("HHID")["PASTA"].sum().reset_index()
+pasta_per_household.rename(columns={"PASTA": "TOTAL_PASTA"}, inplace=True)
+
+# STEP 2 — Merge totals back into main dataset
+df_merged = pd.merge(df, pasta_per_household, on="HHID", how="left")
+
+# STEP 3 — Apply all three conditions:
+# 1. Area = 2
+# 2. Income > 20000
+# 3. Total pasta > 30
+filtered = df_merged[
+    (df_merged["AREA"] == 2) &
+    (df_merged["INCOME"] > 20000) &
+    (df_merged["TOTAL_PASTA"] > 30)
+]
+
+# STEP 4 — Count unique households
+answer = filtered["HHID"].nunique()
+
+print("📌 Number of households meeting all conditions:", answer)
+poorest_area = poorest['AREA']
+wealthiest_area = wealthiest['AREA']
+
+print(f"The poorest household is present in Area: {poorest_area}")
+print(f"The wealthiest household is present in Area: {wealthiest_area}")
+pasta_stats_by_hh_time = df.groupby(['HHID', 'TIME'])['PASTA'].agg(['mean', 'std'])
+print("Mean and Standard Deviation of Pasta Purchased by Household and Time Unit:")
+display(pasta_stats_by_hh_time.head())
+mport matplotlib.pyplot as plt
+import seaborn as sns
+
+# Calculate average income by area
+average_income_by_area = df.groupby('AREA')['INCOME'].mean().reset_index()
+
+# Create the bar plot
+plt.figure(figsize=(10, 6))
+sns.barplot(x='AREA', y='INCOME', data=average_income_by_area, palette='viridis')
+plt.xlabel('Area')
+plt.ylabel('Average Income')
+plt.title('Average Income by Area')
+plt.grid(axis='y', alpha=0.75)
+plt.show()
+import matplotlib.pyplot as plt
+
+# Assuming 'household_totals' is already calculated and available from previous cells.
+# If not, it would need to be recalculated:
+# household_totals = df.groupby('HHID')['PASTA'].sum()
+
+plt.figure(figsize=(10, 6))
+plt.hist(household_totals, bins=30, edgecolor='black')
+plt.xlabel('Total Pasta Purchased (Units)')
+plt.ylabel('Number of Households')
+plt.title('Histogram of Total Pasta Purchases by Household')
+plt.grid(axis='y', alpha=0.75)
+plt.show()
+correlation = df['PASTA'].corr(df['EXPOS'])
+print(f"The correlation between PASTA purchases and EXPOS is: {correlation}")
